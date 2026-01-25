@@ -1,34 +1,22 @@
 using System.ComponentModel.DataAnnotations;
-using Amazon.CognitoIdentityProvider;
-using Amazon.CognitoIdentityProvider.Model;
+using Server.Application.Auth;
 
 namespace Server.Handlers.Auth.V1;
 
 public static class VerifyEmail
 {
-  public static async Task<IResult> Handle(Request request, AmazonCognitoIdentityProviderClient client)
+  public static async Task<IResult> Handle(VerifyEmailRequest request, ICognitoService cognito)
   {
-    var cognitoClientId = Environment.GetEnvironmentVariable("COGNITO_CLIENT_ID");
-    if (string.IsNullOrEmpty(cognitoClientId))
-    {
-      return Results.Problem("Cognito Client ID is not configured.");
-    }
 
-    var confirmSignUpRequest = new ConfirmSignUpRequest
-    {
-      ClientId = cognitoClientId,
-      Username = request.Email,
-      ConfirmationCode = request.Code
-    };
-
-    await client.ConfirmSignUpAsync(confirmSignUpRequest);
+    await cognito.VerifyEmailAsync(request);
 
     return Results.Ok();
   }
 
-  public record Request(
-    [Required, EmailAddress]
-    string Email,
-    [Required]
-    string Code);
 }
+
+public record VerifyEmailRequest(
+  [Required, EmailAddress]
+    string Email,
+  [Required]
+    string Code);
