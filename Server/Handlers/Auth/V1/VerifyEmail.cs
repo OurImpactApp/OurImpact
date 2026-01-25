@@ -7,7 +7,6 @@ public static class VerifyEmail
 {
   public static async Task<IResult> Handle(VerifyEmailRequest request, ICognitoService cognito)
   {
-
     await cognito.VerifyEmailAsync(request);
 
     return Results.Ok();
